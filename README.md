@@ -1,2 +1,2 @@
 # setting-up-snowflake-account
-setting up a snowflake account for my team
+writing sql script to set up a snowflake account for my team
