@@ -1,1 +1,69 @@
+***SNOWFLAKE SETUP FOR DBT***
+show roles;
+drop role transform;
+
+create database raw_business_data;
+create warehouse transform_wh with warehouse_size = 'MEDIUM';
+
+ create role
+create role transform;
+
+-- *** The role role needs to be able to read but not tranform anything in the raw database ***
+grant IMPORTED PRIVILEGES on database raw_business_data to role transform; --did not work
+
+-- Allow usage of the database
+GRANT USAGE ON DATABASE raw_business_data TO ROLE transform;
+
+-- Allow usage of all schemas
+GRANT USAGE ON ALL SCHEMAS IN DATABASE raw_business_data TO ROLE transform;
+GRANT USAGE ON FUTURE SCHEMAS IN DATABASE raw_business_data TO ROLE transform;
+
+-- Allow read access to all existing and future tables and views
+GRANT SELECT ON ALL TABLES IN DATABASE raw_business_data TO ROLE transform;
+GRANT SELECT ON FUTURE TABLES IN DATABASE raw_business_data TO ROLE transform;
+
+GRANT SELECT ON ALL VIEWS IN DATABASE raw_business_data TO ROLE transform;
+GRANT SELECT ON FUTURE VIEWS IN DATABASE raw_business_data TO ROLE transform;
+
+
+-- *** The role role needs to be able to read and write and create schema on the nalytics database ***
+
+-- Allow usage of the database
+GRANT USAGE ON DATABASE analytics TO ROLE transform;
+
+-- GRANT REFERENCE_USAGE ON DATABASE analytics TO ROLE transform;
+-- 003600 (0A000): REFERENCE_USAGE ON DATABASE ANALYTICS can only be granted to share(s).
+GRANT MODIFY ON DATABASE analytics TO ROLE transform;
+GRANT MONITOR ON DATABASE analytics TO ROLE transform;
+GRANT CREATE SCHEMA ON DATABASE analytics TO ROLE transform;
+
+-- grant the role access to the warehouse transform_wh
+GRANT OPERATE on WAREHOUSE transform_wh TO ROLE transform;
+GRANT USAGE on WAREHOUSE transform_wh TO ROLE transform;
+
+-- Grant role to myself
+grant role transform to user datalady;
+
+--create a service user to be used to run jobs in DBT cloud
+--create  new users
+create user datalady
+ email = 'chidinmaokeh75@gmail.com'
+ password = 'pass123!@#'
+ default_role = transform
+ default_warehouse = transform_wh
+ must_change_password = false;
+
+ grant role transform to user datalady;
+
+
+--create users for new developers/analytics engineers in the project
+-- drop user u1t2h3m4a5n6;
+
+create user u1t2h3m4a5n6
+email = 'u1t2h3m4a5n6@gmail.com'
+password = 'pass123!@'
+--modified_password = 'Password123!@#'
+default_role = transform
+default_warehouse = transform_wh
+must_change_password = true;
 
